@@ -8,11 +8,11 @@ public class testProyecto {
 	
 	//Main
 	public static ArrayList<Block> blockChain = new ArrayList<Block>(); 
-	public static int difficulty = 10;
+	public static int difficulty = 3;
 
 	public static void main(String[] args) {	
 		
-		//Añade los bloques al ArrayList
+		//Aï¿½ade los bloques al ArrayList
 		blockChain.add(new Block("Primer Bloque", "1"));	
 		System.out.println("Minando Primer Bloque...");
 		blockChain.get(0).mineBlock(difficulty);
