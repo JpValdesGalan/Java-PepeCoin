@@ -45,7 +45,7 @@ public class Transaction {
 	public boolean processTransaction() {
 		
 		if(verifySignature() == false) {
-			System.out.println("#Transaction Signature failed to verify");
+			System.out.println("#Fallo de verificacion de firma en la Transaccion.");
 			return false;
 		}
 				
@@ -56,8 +56,8 @@ public class Transaction {
 
 		//Checks if transaction is valid:
 		if(getInputsValue() < testProyecto.minimumTransaction) {
-			System.out.println("Transaction Inputs too small: " + getInputsValue());
-			System.out.println("Please enter the amount greater than " + testProyecto.minimumTransaction);
+			System.out.println("Valor de Transaccion muy pequeño: " + getInputsValue());
+			System.out.println("Porfavor introduce un valor mayor a " + testProyecto.minimumTransaction);
 			return false;
 		}
 		

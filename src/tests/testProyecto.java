@@ -83,11 +83,11 @@ public class testProyecto {
 				Transaction currentTransaction = currentBlock.transactions.get(t);
 				
 				if(!currentTransaction.verifySignature()) {
-					System.out.println("#Signature on Transaction(" + t + ") is Invalid");
+					System.out.println("#Firma en la Toransaccion (" + t + ") es invalida.");
 					return false; 
 				}
 				if(currentTransaction.getInputsValue() != currentTransaction.getOutputsValue()) {
-					System.out.println("#Inputs are note equal to outputs on Transaction(" + t + ")");
+					System.out.println("#Los valores no coinciden en la Transaccion (" + t + ")");
 					return false; 
 				}
 				
@@ -139,7 +139,7 @@ public class testProyecto {
 		genesisTransaction.transactionId = "0"; //manually set the transaction id
 		genesisTransaction.outputs.add(new TransactionOutput(genesisTransaction.reciepient, genesisTransaction.value, genesisTransaction.transactionId)); //manually add the Transactions Output
 		UTXOs.put(genesisTransaction.outputs.get(0).id, genesisTransaction.outputs.get(0)); //its important to store our first transaction in the UTXOs list.
-		System.out.println("Creating and Mining Genesis block... ");
+		System.out.println("Creando y minando bloque genesis...");
 		Block genesis = new Block("0");
 		genesis.addTransaction(genesisTransaction);
 		addBlock(genesis);

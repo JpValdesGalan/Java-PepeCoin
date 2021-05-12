@@ -41,13 +41,13 @@ public class Block {
 		if(transaction == null) return false;		
 		if((!"0".equals(previousHash))) {
 			if((transaction.processTransaction() != true)) {
-				System.out.println("Transaction failed to process. Discarded.");
+				System.out.println("Transaccion declinada.");
 				return false;
 			}
 		}
 
 		transactions.add(transaction);
-		System.out.println("Transaction Successfully added to Block");
+		System.out.println("Transaccion añadida al bloque.");
 		return true;
 	}
 	
