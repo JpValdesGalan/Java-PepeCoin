@@ -13,6 +13,8 @@ public class Wallet {
 	private String username;
 	private String password;
 	
+	public double dollars = 500;
+	
 	public PrivateKey privateKey;
 	public PublicKey publicKey;
 	
@@ -72,7 +74,7 @@ public class Wallet {
 		return total;
 	}
 	
-	public Transaction sendFunds(PublicKey _recipient,float value ) {
+	public Transaction sendFunds(PublicKey recipient,float value ) {
 		if(getBalance() < value) {
 			System.out.println("#No hay fondos suficientes. Transaccion declinada.");
 			return null;
@@ -87,7 +89,7 @@ public class Wallet {
 			if(total > value) break;
 		}
 		
-		Transaction newTransaction = new Transaction(publicKey, _recipient , value, inputs);
+		Transaction newTransaction = new Transaction(publicKey, recipient , value, inputs);
 		newTransaction.generateSignature(privateKey);
 		
 		for(TransactionInput input: inputs){

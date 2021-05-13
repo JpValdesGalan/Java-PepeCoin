@@ -13,40 +13,132 @@ public class testProyecto {
 	
 	public static ArrayList<Block> blockchain = new ArrayList<Block>();
 	public static HashMap<String,TransactionOutput> UTXOs = new HashMap<String,TransactionOutput>();
+	public static List<Wallet> banco = new ArrayList<Wallet>();
 	
 	public static int difficulty = 5;
 	public static float minimumTransaction = 0.1f;
-	public static Wallet walletA;
-	public static Wallet walletB;
+	public static Wallet pepePurse;
 	public static Transaction genesisTransaction;
 	
 	public static Block currentBlock;
+	public static int exit = 0;
 
 	//Main
 	public static void main(String[] args) {
 		
-		//add our blocks to the blockchain ArrayList:
+		@SuppressWarnings("resource")
+		Scanner input = new Scanner(System.in);
+		
+		initialize();
+		newUser("Dodgberto", "elonmusk");
+		newUser("Elsapito", "belinda");
+		newUser("","");
+		
+		while(exit != 0) {
+			
+			
+			
+		}
+		
+		//buyPepecoin(getWallet("Dodgberto"), "elonmusk", 420);
+		
+		//sellPepecoin(getWallet("Dodgberto"), "elonmusk", 1764);
+		
+		//isChainValid();
+		
+	}
+	
+	public static void newUser(String username, String password) {
+		banco.add(new Wallet(username, password));
+		
+	}
+	
+	public static Wallet getWallet(String username) {
+		for(Wallet wallet: banco) {
+			if(wallet.getUsername() == username) {
+				return wallet;
+			}
+		}
+		return null;
+	}
+	
+	//Creamos Bloque de transaccion
+	public static void blockTransaction(Wallet walletA, String password, Wallet walletB, float value) {
+		if(password == walletA.getPassword()) {
+			Block newBlock = new Block(currentBlock.hash);
+			System.out.println("\n" + walletA.getUsername() + " balance is: " + walletA.getBalance());
+			System.out.println("\n" + walletA.getUsername() + " esta enviando " + value + " pepeCoins a " + walletB.getUsername() + "...");
+			newBlock.addTransaction(walletA.sendFunds(walletB.publicKey, value));
+			addBlock(newBlock);
+			System.out.println("\n" + walletA.getUsername() + " balance: " + walletA.getBalance());
+			System.out.println(walletB.getUsername() + " balance: " + walletB.getBalance());
+			currentBlock = newBlock;
+		} else {
+			System.out.println("Validacion incorrecta. Revise su contraseña.");
+		}
+		
+	}
+	
+	//Comprar pepecoins con dollars
+	public static void buyPepecoin(Wallet walletA, String password, float dollar) {
+		float pepecoin = (float) (dollar * 4.20);
+		if(password == walletA.getPassword()) {
+			Block newBlock = new Block(currentBlock.hash);
+			System.out.println("\n" + walletA.getUsername() + " balance is: " + walletA.getBalance());
+			System.out.println("\n" + walletA.getUsername() + " cambio " + dollar + "$ en pepeCoins(" + pepecoin + ").");
+			if(newBlock.addTransaction(pepePurse.sendFunds(walletA.publicKey, pepecoin))) {
+				addBlock(newBlock);
+				System.out.println("\n" + walletA.getUsername() + " balance: " + walletA.getBalance());
+				System.out.println(pepePurse.getUsername() + " balance: " + pepePurse.getBalance());
+				currentBlock = newBlock;
+				walletA.dollars -= dollar;
+			} 
+		} else {
+			System.out.println("Validacion incorrecta. Revise su contraseña.");
+		}
+		
+	}
+	
+	//Comprar pepecoins con dollars
+	public static void sellPepecoin(Wallet walletA, String password, float pepecoin) {
+		float dollar = (float) (pepecoin / 4.20);
+		if(password == walletA.getPassword()) {
+			Block newBlock = new Block(currentBlock.hash);
+			System.out.println("\n" + walletA.getUsername() + " balance is: " + walletA.getBalance());
+			System.out.println("\n" + walletA.getUsername() + " cambio " + pepecoin + " pepecoins a " + dollar + "$.");
+			if(newBlock.addTransaction(walletA.sendFunds(pepePurse.publicKey, pepecoin))) {
+				addBlock(newBlock);
+				System.out.println("\n" + walletA.getUsername() + " balance: " + walletA.getBalance());
+				System.out.println(pepePurse.getUsername() + " balance: " + pepePurse.getBalance());
+				currentBlock = newBlock;
+				walletA.dollars += dollar;
+			} 
+		} else {
+			System.out.println("Validacion incorrecta. Revise su contraseña.");
+		}	
+	}
+
+	
+	public static void printJsonBuilder () {
+		String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockchain);		
+		System.out.println(blockchainJson);
+	}
+	
+	public static void initialize () {
 		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider()); //Bouncey Security Provider
 		
-		//Creamos los wallets:
-		walletA = new Wallet("Dodgeberto", "elonmusk");
-		walletB = new Wallet("Elsapito", "belinda");		
 		Wallet coinbase = new Wallet("Pepe", "pepecoin");
-		
-		setGenesisFirstTransaction(coinbase);
-		
-		blockTransaction(walletA, walletB, 40f);
-		blockTransaction(walletA, walletB, 1000f);
-		blockTransaction(walletA, walletB, 5f);
-		blockTransaction(walletB, walletA, 20f);
-		blockTransaction(walletB, walletA, 10f);
-		blockTransaction(walletA, walletB, 15f);
-		blockTransaction(walletA, walletB, 20f);
-		
-		isChainValid();
-		
-		printJsonBuilder();
-		
+		pepePurse = new Wallet("admin", "admin");
+		genesisTransaction = new Transaction(coinbase.publicKey, pepePurse.publicKey, 10000f, null);
+		genesisTransaction.generateSignature(coinbase.privateKey);	 //manually sign the genesis transaction	
+		genesisTransaction.transactionId = "0"; //manually set the transaction id
+		genesisTransaction.outputs.add(new TransactionOutput(genesisTransaction.reciepient, genesisTransaction.value, genesisTransaction.transactionId)); //manually add the Transactions Output
+		UTXOs.put(genesisTransaction.outputs.get(0).id, genesisTransaction.outputs.get(0)); //its important to store our first transaction in the UTXOs list.
+		System.out.println("Creando y minando bloque genesis...");
+		Block genesis = new Block("0");
+		genesis.addTransaction(genesisTransaction);
+		addBlock(genesis);
+		currentBlock = genesis;
 	}
 	
 	public static Boolean isChainValid() {
@@ -132,87 +224,4 @@ public class testProyecto {
 		blockchain.add(newBlock);
 	}
 	
-	//Crea primer bloque genesis
-	public static void setGenesisFirstTransaction(Wallet coinbase) {
-		genesisTransaction = new Transaction(coinbase.publicKey, walletA.publicKey, 100f, null);
-		genesisTransaction.generateSignature(coinbase.privateKey);	 //manually sign the genesis transaction	
-		genesisTransaction.transactionId = "0"; //manually set the transaction id
-		genesisTransaction.outputs.add(new TransactionOutput(genesisTransaction.reciepient, genesisTransaction.value, genesisTransaction.transactionId)); //manually add the Transactions Output
-		UTXOs.put(genesisTransaction.outputs.get(0).id, genesisTransaction.outputs.get(0)); //its important to store our first transaction in the UTXOs list.
-		System.out.println("Creando y minando bloque genesis...");
-		Block genesis = new Block("0");
-		genesis.addTransaction(genesisTransaction);
-		addBlock(genesis);
-		currentBlock = genesis;
-	}
-	
-	//Creamos Bloque de transaccion
-	public static void blockTransaction(Wallet walletA, Wallet walletB, float value) {
-		Block newBlock = new Block(currentBlock.hash);
-		System.out.println("\n" + walletA.getUsername() + " balance is: " + walletA.getBalance());
-		System.out.println("\n" + walletA.getUsername() + " esta enviando " + value + " pepeCoins a " + walletB.getUsername() + "...");
-		newBlock.addTransaction(walletA.sendFunds(walletB.publicKey, value));
-		addBlock(newBlock);
-		System.out.println("\n" + walletA.getUsername() + " balance: " + walletA.getBalance());
-		System.out.println(walletB.getUsername() + " balance: " + walletB.getBalance());
-		currentBlock = newBlock;
-		
-	}
-	
-	public static void printJsonBuilder () {
-		String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockchain);		
-		System.out.println(blockchainJson);
-	}
-	
 }
-/*public class testProyecto {
-	
-	//Main
-	public static ArrayList<Block> blockChain = new ArrayList<Block>(); 
-	public static int difficulty = 6;
-
-	public static void main(String[] args) {	
-		
-		//Añade los bloques al ArrayList
-		blockChain.add(new Block("Primer Bloque", "1"));	
-		System.out.println("Minando Primer Bloque...");
-		blockChain.get(0).mineBlock(difficulty);
-		
-		blockChain.add(new Block("Segundo Bloque",blockChain.get(blockChain.size()-1).hash)); 
-		System.out.println("Minando Segundo Bloque...");
-		blockChain.get(1).mineBlock(difficulty);
-		
-		blockChain.add(new Block("Tercer Bloque",blockChain.get(blockChain.size()-1).hash));
-		System.out.println("Minando Tercer Bloque...");
-		blockChain.get(2).mineBlock(difficulty);
-		
-		String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockChain);		
-		System.out.println(blockchainJson);
-		
-	}
-	
-	//-------------------------------------------------------------------------------------------------------------------
-	
-	public static Boolean isChainValid() {
-		Block currentBlock;
-		Block previousBlock;
-		
-		//For para verificar hashes de la blockChain
-		for (int i = 1; i < blockChain.size(); i++) {
-			currentBlock = blockChain.get(i);
-			previousBlock = blockChain.get(i-1);
-			//Compara Hash registrado con el Hash calculado
-			if (!currentBlock.hash.equals(currentBlock.calculateHash()) ){
-				System.out.println("Current Hashes not equal");			
-				return false;
-			}
-			//Compara el previousHash registrado con el previousHash
-			if (!previousBlock.hash.equals(currentBlock.previousHash) ) {
-				System.out.println("Previous Hashes not equal");
-				return false;
-			}
-		}
-		return true;
-	}
-
-}*/
