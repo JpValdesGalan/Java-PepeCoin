@@ -32,14 +32,12 @@ public class testProyecto {
 		String username;
 		String password;
 
-		
 		Wallet user;
-		
 		
 		while(exitPrograma == 0) {
 			
 			
-			System.out.println("\nSeleccione una opcion: \n1. Iniciar Sesion\n2. Registrarse");
+			System.out.println("\nSeleccione una opcion: \n1. Iniciar Sesion\n2. Registrarse\n3.Salir");
 			opc = Leer.datoInt();
 			switch(opc) {
 			
@@ -55,7 +53,7 @@ public class testProyecto {
 						exitMenu = 0;
 						//Nuevo menu
 						do {
-							System.out.println("\n1. Comprar PepeCoins\n2. Vender PepeCoins\n3. Transferir PepeCoins\n4. Ver Libreta de cuentas\n5. Modificar datos de usuario\n6. Salir");
+							System.out.println("\n1. Comprar PepeCoins\n2. Vender PepeCoins\n3. Transferir PepeCoins\n4. Ver Libreta de cuentas\n5. Modificar datos de usuario\n6. Eliminar Pepecuenta\n7. Salir");
 							opc = Leer.datoInt();
 							switch(opc) {
 							case 1:
@@ -86,9 +84,10 @@ public class testProyecto {
 								break;
 							case 4:
 								BlockChain.printJsonBuilder();
+								BlockChain.isChainValid();
 								break;
 							case 5:
-								System.out.println("Ingresa tu password actual para confirmar: ");
+								System.out.println("\nIngresa tu password actual para confirmar: ");
 								password = Leer.dato();
 								if(user.getPassword().equals(password)) {
 									System.out.println("Ingresar nuevo username: ");
@@ -103,8 +102,13 @@ public class testProyecto {
 								}
 								break;
 							case 6:
+								System.out.println("\nEscribe la contraseña si estas seguro de borrar tu PepeCuenta: ");
+								password = Leer.dato();
+								deleteUser(user.getUsername(), password);
 								exitMenu = 1;
 								break;
+							case 7:
+								exitMenu = 1;
 							default:
 								break;
 							}
@@ -115,7 +119,6 @@ public class testProyecto {
 					
 				} catch (NullPointerException e) {
 					System.out.println("Usuario Inexistente.\nAdios");
-					//exit = 1;
 				}
 				
 				break;
@@ -128,7 +131,7 @@ public class testProyecto {
 				System.out.println("Usuario " + username + " Creado!");
 				break;
 			case 3:
-				System.out.println("Gracias por utilizar Pepecoin!!!\nMuchos PepeSaludos");
+				System.out.println("\nGracias por utilizar Pepecoin!!!\nMuchos PepeSaludos");
 				exitPrograma = 1;
 			default:
 				break;
@@ -136,17 +139,17 @@ public class testProyecto {
 			
 		}
 		
-		//buyPepecoin(getWallet("Dodgberto"), "elonmusk", 420);
-		
-		//sellPepecoin(getWallet("Dodgberto"), "elonmusk", 1764);
-		
-		//isChainValid();
-		
 	}
 	
 	public static void newUser(String username, String password) {
 		banco.add(new Wallet(username, password));
 		
+	}
+	
+	public static void deleteUser(String username, String password) {
+		sellPepecoin(getWallet(username), password, getWallet(username).getBalance());
+		System.out.println("\nBYE BYE " + username + "-niichan");
+		banco.remove(banco.indexOf(getWallet(username)));
 	}
 	
 	public static Wallet getWallet(String username) {
