@@ -1,7 +1,6 @@
 package clases;
 
 import java.security.*;
-import tests.*;
 import java.util.ArrayList;
 
 public class Transaction {
@@ -51,13 +50,13 @@ public class Transaction {
 				
 		//Gathers transaction inputs (Making sure they are unspent):
 		for(TransactionInput i : inputs) {
-			i.UTXO = testProyecto.UTXOs.get(i.transactionOutputId);
+			i.UTXO = BlockChain.UTXOs.get(i.transactionOutputId);
 		}
 
 		//Checks if transaction is valid:
-		if(getInputsValue() < testProyecto.minimumTransaction) {
+		if(getInputsValue() < BlockChain.minimumTransaction) {
 			System.out.println("Valor de Transaccion muy pequeño: " + getInputsValue());
-			System.out.println("Porfavor introduce un valor mayor a " + testProyecto.minimumTransaction);
+			System.out.println("Porfavor introduce un valor mayor a " + BlockChain.minimumTransaction);
 			return false;
 		}
 		
@@ -69,13 +68,13 @@ public class Transaction {
 				
 		//Add outputs to Unspent list
 		for(TransactionOutput o : outputs) {
-			testProyecto.UTXOs.put(o.id , o);
+			BlockChain.UTXOs.put(o.id , o);
 		}
 		
 		//Remove transaction inputs from UTXO lists as spent:
 		for(TransactionInput i : inputs) {
 			if(i.UTXO == null) continue; //if Transaction can't be found skip it 
-			testProyecto.UTXOs.remove(i.UTXO.id);
+			BlockChain.UTXOs.remove(i.UTXO.id);
 		}
 		
 		return true;

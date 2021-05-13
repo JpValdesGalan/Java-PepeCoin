@@ -1,6 +1,5 @@
 package clases;
 
-import tests.*;
 import java.security.*;
 import java.security.spec.ECGenParameterSpec;
 import java.util.*;
@@ -13,7 +12,7 @@ public class Wallet {
 	private String username;
 	private String password;
 	
-	public double dollars = 500;
+	private double dollars = 500;
 	
 	public PrivateKey privateKey;
 	public PublicKey publicKey;
@@ -35,6 +34,10 @@ public class Wallet {
 	public String getPassword() {
 		return password;
 	}
+	
+	public double getDollars() {
+		return dollars;
+	}
 
 	public void setUsername(String username) {
 		this.username = username;
@@ -42,6 +45,16 @@ public class Wallet {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	
+	public void setDollars(double dollars) {
+		this.dollars = dollars;
+	}
+	
+	public void getAccountBalance() {
+		System.out.println("\nUsername: " + getUsername());
+		System.out.println("Pepecoins: " + getBalance());
+		System.out.println("Dollars: " + getDollars());
 	}
 
 	public void generateKeyPair() {
@@ -64,7 +77,7 @@ public class Wallet {
 	
 	public float getBalance() {
 		float total = 0;	
-        for (Map.Entry<String, TransactionOutput> item: testProyecto.UTXOs.entrySet()){
+        for (Map.Entry<String, TransactionOutput> item: BlockChain.UTXOs.entrySet()){
         	TransactionOutput UTXO = item.getValue();
             if(UTXO.isMine(publicKey)) { //if output belongs to me ( if coins belong to me )
             	UTXOs.put(UTXO.id,UTXO); //add it to our list of unspent transactions.
